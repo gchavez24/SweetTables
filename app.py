@@ -49,17 +49,14 @@ class ComputationEngine:
             raise ValueError(f"No computed column found with the name: {name}")
         return self.computed_columns[name]
 
-# Initial dataset
 data = {
     "col1": Column("col1", [1, 2, 3]),
     "col2": Column("col2", [4, 5, 6])
 }
 
-# Create table and computation engine
 table = Table("TestTable", data)
 engine = ComputationEngine(table)
 
-# Perform initial computations
 engine.compute_sum("sum_col", "col1", "col2")
 engine.compute_diff("diff_col", "col1", "col2")
 
@@ -79,7 +76,6 @@ def index():
 
 @app.route('/refresh', methods=['POST'])
 def refresh_table():
-    # Randomizing data when refreshing
     new_data = {
         "col1": Column("col1", [random.randint(1, 10) for _ in range(5)]),
         "col2": Column("col2", [random.randint(1, 10) for _ in range(5)])
@@ -88,13 +84,11 @@ def refresh_table():
     new_table = Table("TestTable", new_data)
     new_engine = ComputationEngine(new_table)
     
-    # Recalculate sum and diff columns
     new_engine.compute_sum("sum_col", "col1", "col2")
     new_engine.compute_diff("diff_col", "col1", "col2")
 
     headers, rows = new_table.display_table()
     
-    # Add the sum and diff columns to the rows
     sum_column = new_engine.get_computed_column("sum_col")
     diff_column = new_engine.get_computed_column("diff_col")
     
@@ -102,7 +96,7 @@ def refresh_table():
         row.append(sum_column[i])
         row.append(diff_column[i])
 
-    headers += ["Sum", "Difference"]  # Add headers for sum and diff columns
+    headers += ["Sum", "Difference"]
     
     return render_template('index.html', headers=headers, rows=rows)
 
